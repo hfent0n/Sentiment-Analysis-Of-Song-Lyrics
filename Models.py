@@ -1,3 +1,4 @@
+from unicodedata import bidirectional
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
@@ -46,6 +47,48 @@ class CLSTM(nn.Module):
 
         return self.fc(hidden)
 
+
+class LSTMCNN(nn.Module):
+    def __init__(self, vocab_size, embedding_dim, n_filters, filter_sizes, output_dim, 
+                n_layers, hidden_dim, bidirectional, dropout, pad_idx):
+        super().__init__()
+        self.id = 'lstmcnn'
+        self.output_dim = output_dim
+        self.bidirectional = bidirectional
+        self.embedding = nn.Embedding(vocab_size, embedding_dim, padding_idx=pad_idx)
+        self.rnn = nn.LSTM(embedding_dim, 
+                    hidden_dim,
+                    num_layers=n_layers,
+                    bidirectional=bidirectional,
+                    dropout=dropout)
+                
+        self.convs = nn.ModuleList([
+                                    nn.Conv2d(in_channels = 1, 
+                                              out_channels = n_filters, 
+                                              kernel_size = (fs, (int(bidirectional) + 1) * hidden_dim)) # Double size for bidirectional
+                                    for fs in filter_sizes
+                                    ])
+        
+        self.dropout = nn.Dropout(dropout)
+
+       
+        self.fc = nn.Linear(len(filter_sizes) * n_filters, output_dim)
+
+
+
+    def forward(self, text, text_lengths):
+        embed = self.dropout(self.embedding(text))
+        packed_embed = nn.utils.rnn.pack_padded_sequence(embed, text_lengths.to('cpu'))
+        packed_output, (hidden, cell) = self.rnn(packed_embed)
+        output, output_lengths = nn.utils.rnn.pad_packed_sequence(packed_output)
+        output = output.unsqueeze(-1).permute(1, 3, 0, 2)
+        conved = [F.relu(conv(output)).squeeze(3) for conv in self.convs]
+        pooled = [F.max_pool1d(conv, conv.shape[2]).squeeze(2) for conv in conved]
+        
+        cat = self.dropout(torch.cat(pooled, dim = 1))
+
+        return self.fc(cat)
+
 class CNN(nn.Module):
     def __init__(self, vocab_size, embedding_dim, n_filters, filter_sizes, output_dim, 
                  dropout):
@@ -80,6 +123,7 @@ class RNN(nn.Module):
         super().__init__()
         self.id = 'lstm'
         self.output_dim = output_dim
+        self.bidirectional = bidirectional
         self.embedding = nn.Embedding(vocab_size, embedding_dim, padding_idx=pad_idx)
         self.rnn = nn.LSTM(embedding_dim, 
         hidden_dim,
@@ -99,6 +143,10 @@ class RNN(nn.Module):
         packed_embed = nn.utils.rnn.pack_padded_sequence(embed, text_lengths.to('cpu'))
         packed_output, (hidden, cell) = self.rnn(packed_embed)
         output, output_lengths = nn.utils.rnn.pad_packed_sequence(packed_output)
-        hidden = self.dropout(torch.cat((hidden[-2,:,:], hidden[-1,:,:]), dim = 1))
+        if self.bidirectional:
+            hidden = self.dropout(torch.cat((hidden[-2,:,:], hidden[-1,:,:]), dim = 1))
+        else:
+            hidden = self.dropout(hidden[-1,:,:])
         return self.fc(hidden)
+
 
