@@ -1,10 +1,11 @@
+#Code adapted from tutorials
 import random
 import torch
 from torchtext.legacy import data
 
 def prepare_data(emotion_model, dl_model, device, BATCH_SIZE, SEED, MAX_VOCAB_SIZE):
     if emotion_model == '4cat':
-        if dl_model == 'lstm':
+        if dl_model in ['lstm', 'lstmcnn']:
             LYRICS = data.Field(include_lengths=True)
             LABEL = data.LabelField()
         else:
@@ -39,7 +40,7 @@ def prepare_data(emotion_model, dl_model, device, BATCH_SIZE, SEED, MAX_VOCAB_SI
         return LYRICS, LABEL, train_iterator, valid_iterator, test_iterator
 
     elif emotion_model == '2d':
-        if dl_model == 'lstm':
+        if dl_model == dl_model in ['lstm', 'lstmcnn']:
             LYRICS = data.Field(include_lengths=True)
         else:
             LYRICS = data.Field(batch_first=True)
