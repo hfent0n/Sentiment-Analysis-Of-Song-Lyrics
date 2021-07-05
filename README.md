@@ -76,9 +76,15 @@ Using the MoodyLyrics dataset, the results of the models predictions for emotion
 
 ## References
 [1] Acheampong, F.A., Wenyu, C. and Nunoo‐Mensah, H., 2020. Text‐based emotion detection: Advances, challenges, and opportunities. _Engineering Reports_, _2_(7), p.e12189.
+
 [2] Tsaptsinos, A., 2017. Lyrics-based music genre classification using a hierarchical attention network. _arXiv preprint arXiv:1707.04678_.
+
 [3] Polignano, M., Basile, P., de Gemmis, M. and Semeraro, G., 2019, June. A comparison of word-embeddings in emotion detection from text using bilstm, cnn and self-attention. In _Adjunct Publication of the 27th Conference on User Modeling, Adaptation and Personalization_ (pp. 63-68).
+
 [4] Chatterjee A, Narahari KN, Joshi M, Agrawal P. SemEval-2019 task 3: EmoContext contextual emotion detection in text. InProceedings of the 13th International Workshop on Semantic Evaluation 2019 Jun (pp. 39-48).
+
 [5] Hochreiter, S. and Schmidhuber, J., 1997. Long short-term memory. _Neural computation_, _9_(8), pp.1735-1780.
+
 [6] Sharif Razavian, Ali, Hossein Azizpour, Josephine Sullivan, and Stefan Carlsson. "CNN features off-the-shelf: an astounding baseline for recognition." In _Proceedings of the IEEE conference on computer vision and pattern recognition workshops_, pp. 806-813. 2014.
+
 [7]  Sosa, P.M., 2017. Twitter sentiment analysis using combined LSTM-CNN models. _Eprint Arxiv_, pp.1-9.
